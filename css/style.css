@@ -1,0 +1,125 @@
+.app{
+  display: flex;
+  justify-content: space-between;
+  margin: 10% 20% 0 20%;
+ 
+  max-height: 400px;
+
+  animation-name: bounceParam;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+}
+.app .pointer{
+  width: 90%;
+  
+}
+.app .pointer:hover{
+  cursor: pointer;
+  color: blue;
+}
+
+.app .leftWindow #active{
+  color: red;
+  animation-name: bounceParam;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+}
+.leftWindow{
+  display: block;
+  width: 45%;
+  overflow: auto;
+
+  border: 1px solid #aba7a7;
+  border-radius: 15px;
+  background-color: #fcfcfc;
+
+  animation-name: bounceParam;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+}
+.rightWindow .equip{
+  display: flex;
+  justify-content: space-between;
+  margin-right: 20px;
+
+}
+.app p{
+  margin-bottom: 0;
+}
+.rightWindow{
+  display: block;
+  width: 45%;
+
+padding: 0 10px;
+  border: 1px solid #aba7a7;
+  border-radius: 15px;
+  background-color: #fcfcfc;
+
+  overflow: auto;
+
+
+  animation-name: bounceParam;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+}
+.have-equip{
+display: inline-block;
+}
+.pointer{
+  display: inline-block;
+}
+
+.first_level{
+margin-left: 10px;
+}
+.second_level{
+  margin-left: 20px;
+}
+.third_level{
+  margin-left: 30px;
+}
+
+@media (max-width: 1280px){
+  .app{
+    margin: 5% 10%;
+    max-height: 300px;
+  }
+  .rightWindow{
+    overflow: scroll; 
+    
+ 
+  }
+  .leftWindow{
+    overflow: scroll; 
+    
+    
+  }
+}
+@media (max-width: 800px){
+  .app{
+    margin: 2.5% 5%;
+    max-height: 200px;
+    font-size: small;
+  }
+  .rightWindow{
+    overflow: scroll; 
+  }
+  .leftWindow{
+    overflow: scroll; 
+  }
+}
+
+@keyframes bounceParam {
+
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -10px, 0);
+    transform: translate3d(0, -10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
