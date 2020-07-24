@@ -1,98 +1,138 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
 .app{
   display: flex;
   justify-content: space-between;
   margin: 10% 20% 0 20%;
- 
   max-height: 400px;
-
   animation-name: bounceParam;
   animation-duration: 1.5s;
   animation-iteration-count: 1;
 }
 .app .pointer{
-  width: 90%;
-  
+  display: inline-block;
 }
 .app .pointer:hover{
   cursor: pointer;
   color: blue;
 }
+.app p{
+  margin-bottom: 0;
+}
 
+.app .leftWindow{
+  display: block;
+  width: 45%;
+  overflow: auto;
+  border: 1px solid #aba7a7;
+  border-radius: 15px;
+  background-color: #fcfcfc;
+  animation-name: bounceParam;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+}
+.app .first_level{
+  margin-left: 10px;
+}
+.app .second_level{
+  margin-left: 20px;
+}
+.app .third_level{
+  margin-left: 30px;
+}
+.app .leftWindow .pointer{
+  width: 90%;
+}
 .app .leftWindow #active{
   color: red;
   animation-name: bounceParam;
   animation-duration: 1.5s;
   animation-iteration-count: 1;
 }
-.leftWindow{
+
+
+.app .rightWindow{
   display: block;
   width: 45%;
-  overflow: auto;
-
+  padding: 0 10px;
   border: 1px solid #aba7a7;
   border-radius: 15px;
   background-color: #fcfcfc;
-
+  overflow: auto;
   animation-name: bounceParam;
   animation-duration: 1.5s;
   animation-iteration-count: 1;
 }
-.rightWindow .equip{
-  display: flex;
-  justify-content: space-between;
-  margin-right: 20px;
-
-}
-.app p{
-  margin-bottom: 0;
-}
-.rightWindow{
-  display: block;
-  width: 45%;
-
-padding: 0 10px;
-  border: 1px solid #aba7a7;
-  border-radius: 15px;
-  background-color: #fcfcfc;
-
-  overflow: auto;
-
-
+.app .top-info{
   animation-name: bounceParam;
-  animation-duration: 2s;
+  animation-duration: 1.5s;
   animation-iteration-count: 1;
 }
-.have-equip{
-display: inline-block;
-}
-.pointer{
-  display: inline-block;
+.app .top-info#without-parts{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
 }
 
-.first_level{
-margin-left: 10px;
+.app .rightWindow .equip{
+  display: flex;
+  justify-content: space-between;
 }
-.second_level{
-  margin-left: 20px;
+.app .equip.pointer{
+  animation-name: bounceParam;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
 }
-.third_level{
-  margin-left: 30px;
+.app .have-equip{
+  display: inline-block;
 }
+.app #addEquip{
+  margin-top: 15px;
+}
+
+
+.btn {
+  display: inline-block;
+  font-family: arial,sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: rgb(68,68,68);
+  text-decoration: none;
+  user-select: none;
+  padding: .2em 1.2em;
+  outline: none;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 2px;
+  background: rgb(245,245,245) linear-gradient(#f4f4f4, #f1f1f1);
+  transition: all .218s ease 0s;
+}
+.btn:hover {
+  color: rgb(24,24,24);
+  border: 1px solid rgb(198,198,198);
+  background: #f7f7f7 linear-gradient(#f7f7f7, #f1f1f1);
+  box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+.btn:active {
+  color: rgb(51,51,51);
+  border: 1px solid rgb(204,204,204);
+  background: rgb(238,238,238) linear-gradient(rgb(238,238,238), rgb(224,224,224));
+  box-shadow: 0 1px 2px rgba(0,0,0,.1) inset;
+}
+
 
 @media (max-width: 1280px){
   .app{
     margin: 5% 10%;
     max-height: 300px;
   }
-  .rightWindow{
+  .app .rightWindow{
     overflow: scroll; 
-    
- 
   }
-  .leftWindow{
+  .app .leftWindow{
     overflow: scroll; 
-    
-    
   }
 }
 @media (max-width: 800px){
@@ -101,11 +141,19 @@ margin-left: 10px;
     max-height: 200px;
     font-size: small;
   }
-  .rightWindow{
-    overflow: scroll; 
+}
+@media (max-width: 650px){
+  .app{
+    max-height: 200px;
+    font-size: medium;
+    display: block;
   }
-  .leftWindow{
-    overflow: scroll; 
+  .app .rightWindow{
+    width: calc(100% - 20px);
+  }
+  .app .leftWindow{
+    width: 100%;
+    margin-bottom: 30px; 
   }
 }
 
@@ -122,4 +170,67 @@ margin-left: 10px;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 300px;
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+
+.modal .modal-content {
+    position: relative;
+    background-color: white;
+    margin: auto;
+    padding: 0;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+.modal .closeModal {
+  cursor: pointer;
+  color: black;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.modal .closemodal:hover,
+.modal .closemodal:focus {
+  cursor: pointer;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+.modal .modal-body {padding: 2px 16px;}
+
+.modalButton{
+  margin-right: 20px;
+}
+
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
 }

@@ -43,7 +43,6 @@ $(document).ready(function(){
                     if (arrRooms.includes (docs[i].data.place.id) && !arrRoomsTemp.includes (docs[i].data.place.id)){
                         arrRoomsTemp.push (docs[i].data.place.id);
                         $('.' + docs[i].data.place.id).prepend('<p class="have-equip">&#9672 </p>');
-                        
                     }
                 }
             }
@@ -105,9 +104,39 @@ $(document).ready(function(){
                 event.stopPropagation();
                 $('.rightWindow').html('');
                 let nameSelectedRoom = arrRooms[i];
-                $('div').removeAttr('id', 'active'); //может удалить все активы со страницы
+
+                //Если нет дочерних комнат, то выводим кнопку
+                for (let j = 0; j < objectRooms.length; j++){
+                    if (nameSelectedRoom == objectRooms[j].id){
+                        if (!objectRooms[j].parts){
+                            $(".rightWindow").prepend('<div class="top-info" id="without-parts"><input type="button" class="btn" id="addEquip" value="Добавить оборудование"/></div>');
+                            $("#without-parts").click( function() {
+                                getModalWindow();
+                                $('.modal-body').html('');
+                                $('.modal-body').append('<p><input type="button" class="btn" id="confirmAddEquip" value="Добавить"/></p>');
+                                $('.modal-body').prepend('<p>Название: <input type="text" id="inputNameEquip"/></p><p>Количество: <input type="number" id="inputCountEquip"/></p>');
+                                $( "#confirmAddEquip").click( function() {
+
+                                    let equipName = document.getElementById('inputNameEquip').value;
+                                    let equipCount = document.getElementById('inputCountEquip').value;
+                                    let placeEquip = nameSelectedRoom;
+
+                                    addEquip(equipName, equipCount, placeEquip); //Функция изменения количества оборудования
+
+                                    alert("Оборудование успешно добавлено!");
+                                    // window.location.reload(); //Перезагружаем страницу
+                                });
+                            });
+                        } else {
+                            $(".rightWindow").prepend('<div class="top-info"></div>');
+                        }
+                    }
+                }
+
+                
+                $('#active').removeAttr('id', 'active'); //может удалить все активы со страницы
                 $('.' + nameSelectedRoom).attr('id', 'active');       
-                //получаем оборудование (Специально именно здесь, так как с базой данных работают несколько человек)
+                //получаем оборудование (Специально именно здесь, так как с базой работают несколько человек, и нужно чаще отслеживать изменения)
                 firebase.firestore().collection("inventory").get().then(response => { 
                     let docs = response.docs.map(x => ({ 
                         id: x.id, 
@@ -130,25 +159,30 @@ $(document).ready(function(){
 
                     let objectEquip = docs;
                     
-                    $('.rightWindow').append('<p>Оборудование в наличии:</p>'); 
-                    showRightMenu(objectEquip, nameSelectedRoom, arrRooms);
+                    $('.top-info').append('<p>Оборудование в наличии:</p>'); 
+        
+                    showRightMenu(objectEquip, nameSelectedRoom, arrRooms); //Вызываем отображение правого меню с оборудованием выбранной комнаты
+                    
+                    getModalWindowDeleteChange(objectEquip); //Вызываем модальное окно для изменения и удаления
+                    
                 });
             });
         }  
     }
 
+    //отображение правого меню
     function showRightMenu(objectEquip, nameSelectedRoom, arrRooms){
-        let countEquipAll = objectEquip.length;
         
-        for (let q = 0; q < countEquipAll; q++){
+        //отображаем оборудование в выбранной комнате
+        for (let q = 0; q < objectEquip.length; q++){
             if (objectEquip[q].placeId){
                 if (objectEquip[q].data.place.id == nameSelectedRoom){
-                    // $('.rightWindow').append('<div class="' + objectEquip[q].data.place.id + ' equip"><p class="equipName">' + objectEquip[q].data.name + '</p><p class"equipCount"> ' + objectEquip[q].data.count + '</p></div>'); 
-                    $('.rightWindow').append('<div class="equip"><p class="equipName">' + objectEquip[q].data.name + '</p><p class"equipCount"> ' + objectEquip[q].data.count + '</p></div>');
+                    $('.rightWindow').append('<div class="equip pointer" id="' + objectEquip[q].id + '"><p class="equipName">' + objectEquip[q].data.name + '</p><p class="equipCount"> ' + objectEquip[q].data.count + '</p></div>');
                 }
             }
         }
         
+        //поиск оборудования в дочерних комнатах, если таковое имеется
         if($("." + nameSelectedRoom).children().length){
             findChildObject(nameSelectedRoom, objectEquip, arrRooms);    
         }
@@ -161,11 +195,131 @@ $(document).ready(function(){
             for (let z = 0; z < temp.length; z++) {
                 if(arrRooms.includes (temp[z])){
                     nameSelectedRoom = temp[z];
-                    showRightMenu(objectEquip, nameSelectedRoom, arrRooms);
+                    showRightMenu(objectEquip, nameSelectedRoom, arrRooms); //Вызываем повторно, для отображения
                 }
             } 
         }    
     };
+
+    //Функция вызова модального окна
+    function getModalWindow(){
+        let modal = document.getElementById('myModal');
+        let body = document.getElementById('modal_body');
+        let closeModalWindow = document.getElementsByClassName("closeModal")[0];
+
+        showModalWindow(modal, body); //показываем модальное окно
+
+        //Закрывает модальное окно
+        closeModalWindow.onclick = function() {
+            modal.style.display = "none";
+            enableScrolling(body); //Вызов функции, разрешающей прокрутку
+        }
+        
+        
+        //Закрывает окно при нажатии на фон
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                enableScrolling(body); //Вызов функции, разрешающей прокрутку
+            }
+        }
+    }
+
+    //Открывает модальное окно
+    function showModalWindow(modal, body){
+        modal.style.display = "block";
+        disableScrolling();
+    }
+
+    //Блокирует прокрутку страницы
+    function disableScrolling(){
+        var x=window.scrollX;
+        var y=window.scrollY;
+        window.onscroll=function(){
+            window.scrollTo(x, y);
+        }; 
+    }
+
+    //Разрешает прокрутку страницы, и проводит разбинд клика на кнопку удалить\изменить
+    function enableScrolling(body){
+        window.onscroll=function(){};
+        $( "#changeEquip" ).unbind("click");
+        $( "#deleteEquip" ).unbind("click");
+        $( "#addEquip" ).unbind("click");
+    }
+
+    //Открываем модальное окно, если выбрали конкретное оборудовагие
+    function getModalWindowDeleteChange(objectEquip){
+        for (let i = 0; i < objectEquip.length; i++){
+            $( "#" + objectEquip[i].id ).click( function() {
+                
+                getModalWindow();
+                
+                $('.modal-body').html(''); //Убираем в модальном окне данные, по ранее выбранному объекту
+                
+                $(".modal-body").prepend('<div class="' + objectEquip[i].id + ' idEquip"><p class="equipName">Название: ' + objectEquip[i].data.name + '</p>Количество: <input type="number" id="inputCountEquip"/></div>');
+                $(".modal-body").append('<p><input type="button" class="btn modalButton" id="changeEquip" value="Изменить"/><input type="button" class="btn" id="deleteEquip" value="Удалить"/></p>');
+
+
+                // let EquipCount = document.getElementById('inputCountEquip').value = objectEquip[i].data.count;
+                let EquipId = objectEquip[i].id;
+                let placeEquip = objectEquip[i].placeId;
+                let nameEquip = objectEquip[i].data.name;
+
+                //Удаление оборудования
+                $( "#deleteEquip").click( function() {
+                    deleteEquip(EquipId); //Функция удаления выбранного оборудования
+                    $(".rightWindow" + " #" + objectEquip[i].id).remove(); //Убираем из правого окна удаленный предмет
+                    alert("Оборудование успешно удалено!");
+                    document.getElementById('myModal').style.display = "none";
+                    let body = document.getElementById('modal_body');
+                    enableScrolling(body); //Вызов функции, разрешающей прокрутку
+                });
+
+                // Изменение оборудования
+                $( "#changeEquip").click( function() {
+                    let EquipCount = document.getElementById('inputCountEquip').value;
+                    changeEquip(EquipId, nameEquip, EquipCount, placeEquip); //Функция изменения количества оборудования
+                    $("#" + objectEquip[i].id + " .equipCount").html(" " + EquipCount); //Изменяем количество выбранного оборудования в правом окне
+                    alert("Оборудование успешно изменено!");
+                });
+            });
+        }
+    }
+
+    //Функция добавления оборудования
+    function addEquip(equipName, equipCount, placeEquip){
+        let filestore = firebase.firestore();
+        filestore.collection("inventory").doc().set({ 
+            name: equipName, 
+            count: equipCount, 
+            place: filestore.collection("places").doc(placeEquip), // main-101 – id места
+        }).then(() => {
+            console.info("Done");
+            window.location.reload(); //Перезагружаем страницу
+        });
+    }
+
+    //Функция удаления оборудования
+    function deleteEquip(EquipId){
+        // "id"  – идентификатор оборудования
+        firebase.firestore().collection("inventory").doc(EquipId).delete().then(() => {
+            console.info("Done");
+        });
+    }
+
+    //функция изменения количества оборудования
+    function changeEquip(EquipId, nameEquip, EquipCount, placeEquip){
+        // "id"  – идентификатор оборудования
+        firebase.firestore().collection("inventory").doc(EquipId).set({ 
+            name: nameEquip,
+            count: EquipCount,
+            place: placeEquip
+        }).then(() => {
+        console.info("Done");
+        });
+    }
+
 }); //document ready
 
 
